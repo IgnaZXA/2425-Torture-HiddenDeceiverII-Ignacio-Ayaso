@@ -49,13 +49,14 @@ function createCharacters(){
         
         const newCharacter = new Character(actCharacter.name, actCharacter.occupation, actCharacter.gold, actCharacter.life, actCharacter.weapon, actCharacter.pouch);
         
+
+        
         // Equiparle un arma aleatoria al personaje.
-        // equipCharacter(newCharacter, charactersArray);
+        equipCharacter(newCharacter, charactersArray);
 
         // Rellenar bolsa
         fillPouch(newCharacter);
-        
-        
+
         charactersArray.push(newCharacter);
     }
 
@@ -70,55 +71,115 @@ function createCharacters(){
 function equipCharacter(character, charactersArray){
 
     // 1º Hacer una lista de las armas que han sido equipadas
-    const weaponsEquipped = [];
+    const notEquippedWeapons = [];
 
-    for (let i = 0; i < charactersArray.length; i++) {
-        const actCharacter = charactersArray[i];
-        
-        if(actCharacter.weapon !== null){
-            weaponsEquipped.push(actCharacter.weapon);
-        }
-        
+
+    for(let i = 0; i < weapons.length; i++){
+        notEquippedWeapons.push(weapons[i]);
     }
 
-    //2º Dependiendo del tipo de character, se podrá escoger un arma u otra no equipada.
-    let weaponFound = false;
-    let weapon = null;
-    while(!weaponFound){
-        let randIndex = Math.floor(Math.random(weapons.length));   
-        weapon = weapons[randIndex];
-
-        let typeWeapon = weapon.name.substring(weapon.name.indexOf(" ") + 1, weapon.name.length);
-
-        switch(character.occupation.toLowerCase()){
-            case("thug"):
-                if(typeWeapon.toLowerCase() === "bow" || typeWeapon.toLowerCase() === "longbow"){
-                    if(weaponsEquipped.indexOf(weapon) === -1){
-                        weaponFound = true;
-                    }
-                }
-
-            break;
-
-            case("priest"):
-                if((weapon.type.toLowerCase() === "arcane")){
-                    if(weaponsEquipped.indexOf(weapon) === -1){
-                        weaponFound = true;
-                    }
-                }
-            break;
-
-            case("peasant"):
-                if( (typeWeapon.toLowerCase() === "wand") && (weapon.type.toLowerCase() === "common")){
-                    if(weaponsEquipped.indexOf(weapon) === -1){
-                        weaponFound = true;
-                    }
-                }
-            break;
+    //Descartar las ya equipadas
+    for(let i = 0; i < notEquippedWeapons.length; i++){
+        const actWeapon = notEquippedWeapons[i];
+        for(let j = 0; j < charactersArray.length; j++){
+            if(actWeapon.name === charactersArray[j].weapon.name){
+                // Este arma ha sido equipada, se borra de la lista de armas no equipadas
+                notEquippedWeapons.splice(i, 1);
+            }
         }
     }
 
-    character.weapon = weapon;
+    // 2º Teniendo ya la lista de armas a equipar, primero miraremos si en esta lista hay algún arma que pueda equipar el character:
+    const chOccupation = character.occupation.toLowerCase();
+
+    let canEquipp = false;
+
+    switch(chOccupation){
+        case("thug"):
+            canEquipp = isAThugWeaponOnArray(notEquippedWeapons);
+        break;
+
+        case("priest"):
+            canEquipp = isAPriestWeaponOnArray(notEquippedWeapons);
+
+        break;
+
+        case("peasant"):
+            canEquipp = isAPeasantWeaponOnArray(notEquippedWeapons);
+
+        break;
+    }
+
+    
+    // 3º Una vez comprobado que sí hay en la lista algún arama equipable para este character, la buscamos de forma aleatoria.
+    if(canEquipp){
+        let weaponFound = false;
+        while(!weaponFound){
+            let rndWeapon = Math.floor(Math.random() * notEquippedWeapons.length); // [0, n-1] n: length
+            const selectedWeapon = notEquippedWeapons[rndWeapon];
+            const weaponType = selectedWeapon.name.substring( selectedWeapon.name.indexOf(" ") + 1, selectedWeapon.name.length).toLowerCase();
+
+            switch(chOccupation){
+
+                case("thug"):
+                    if(weaponType === "bow" || weaponType === "longbow"){
+                        weaponFound = true;
+                    }
+                break;
+        
+                case("priest"):
+                    if(selectedWeapon.type.toLowerCase() === "arcane"){
+                        weaponFound = true;
+                    }
+
+                break;
+        
+                case("peasant"):
+                    if((weaponType === "wand") && (selectedWeapon.type.toLowerCase() === "common")){
+                        weaponFound = true;
+                    }
+                break;
+            }
+
+
+            if(weaponFound) {
+                character.weapon = selectedWeapon;
+            }
+        }
+    }
+}
+
+function isAThugWeaponOnArray(weaponList){
+    for(let i = 0; i < weaponList.length; i++){
+        const typeWeapon = weaponList[i].name.substring( weaponList[i].name.indexOf(" ") + 1, weaponList[i].name.length).toLowerCase();
+
+        if(typeWeapon === "bow" || typeWeapon === "longbow"){
+            return true;
+        }
+    }   
+    return false;
+}
+
+function isAPriestWeaponOnArray(weaponList){
+    for(let i = 0; i < weaponList.length; i++){
+        const typeWeapon = weaponList[i].type.toLowerCase();
+        if(typeWeapon === "arcane"){
+            return true;
+        }
+    }   
+    return false;
+}
+
+function isAPeasantWeaponOnArray(weaponList){
+    for(let i = 0; i < weaponList.length; i++){
+        const weapon = weaponList[i];
+        const typeWeapon = weaponList[i].name.substring( weaponList[i].name.indexOf(" ") + 1, weaponList[i].name.length).toLowerCase();
+
+        if(typeWeapon === "wand" && (weapon.type.toLowerCase() === "common")){
+            return true;
+        }
+    }   
+    return false;
 }
 
 /**
@@ -149,7 +210,7 @@ function fillPouch(character){
     // Mientras pueda el character permitirse un tipo de piedra
     while((affordableStones.length > 0) && (character.gold >= cheaperStoneValue)){
         // Comprar una piedra
-        let randInd = Math.floor(Math.random(affordableStones.length));
+        let randInd = Math.floor(Math.random() * affordableStones.length);
         const stoneSelected = affordableStones[randInd];
 
         // if(character.gold >= stoneSelected.value){
@@ -172,3 +233,41 @@ function fillPouch(character){
     }
 }
 
+
+
+// Se mostrará la lista de personajes 
+function characterList(){
+    console.log("CHARACTERS LIST: ");
+    console.log("----------------")
+    for(let i = 0; i < characters.length; i++){
+        const actChar = characters[i];
+        console.log(actChar.name + "\n----------------");
+        console.log("Occupation: " + actChar.occupation);
+        console.log("Gold: " + actChar.gold + "\n---------" );
+        console.log("weapon" + "\n------");
+        //Cuando este el arma
+        console.log("Name: " + actChar.weapon.name);
+        console.log("Description: " + actChar.weapon.description);
+        console.log("Num dies of damage: " + actChar.weapon.numDieDamage);
+        console.log("Type: " + actChar.weapon.type);
+        console.log("Quality: " + actChar.weapon.quality);
+
+        ///////
+        console.log("------" + "\npouch" + "\n------");
+        for(let j = 0; j < actChar.pouch.length; j++){
+            const actGem = actChar.pouch[j];
+            console.log(actGem.name + ": " + actGem.value + " coins.");
+        }
+        console.log("\n");
+
+    }
+
+}
+
+
+
+
+
+characterList();
+
+// console.log(characters)
