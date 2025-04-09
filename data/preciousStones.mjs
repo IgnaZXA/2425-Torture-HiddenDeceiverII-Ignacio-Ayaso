@@ -1,4 +1,4 @@
-const preciousStones = [
+const preciousStonesData = [
     {
        "name":"Starfire Ruby",
        "description":"A radiant ruby that seems to burn with an inner flame, coveted by royalty.",
@@ -51,4 +51,4 @@ const preciousStones = [
     }
  ];
 
-export{preciousStones}
+export{preciousStonesData}
