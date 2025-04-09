@@ -197,39 +197,34 @@ function fillPouch(character){
         }
     }
 
-
     //Mejora: Función que busque cual es la piedra con menor valor que se puede permitir el player incluir ese valor como el gold minimo que debe tener el player para comprar una piedra
-    let cheaperStoneValue = preciousStones[0].value;
+    let cheapestStoneValue = preciousStones[0].value;
     for(let i = 0; i < affordableStones.length; i++){
-        if(affordableStones[i].value < cheaperStoneValue){
-            cheaperStoneValue = affordableStones[i].value;
+        if(affordableStones[i].value < cheapestStoneValue){
+            cheapestStoneValue = affordableStones[i].value;
         }
     }
 
 
     // Mientras pueda el character permitirse un tipo de piedra
-    while((affordableStones.length > 0) && (character.gold >= cheaperStoneValue)){
+    while((affordableStones.length > 0) && (character.gold >= cheapestStoneValue)){
         // Comprar una piedra
         let randInd = Math.floor(Math.random() * affordableStones.length);
         const stoneSelected = affordableStones[randInd];
 
-        // if(character.gold >= stoneSelected.value){
-            character.pouch.push(new PreciousStone(stoneSelected.name, stoneSelected.description, stoneSelected.value));
-            character.gold -= stoneSelected.value; // El precio a pagar por la piedra
-        // }
-
+        character.pouch.push(new PreciousStone(stoneSelected.name, stoneSelected.description, stoneSelected.value));
+        character.gold -= stoneSelected.value; // El precio a pagar por la piedra
 
         // Comprobar si hay algún tipo de piedra que después de comprar una piedra ya no pueda permitirse
         for (let i = 0; i < affordableStones.length; i++) {
             const actAffordableStone = affordableStones[i];
 
             // Si no se puede permitir esta piedra se borra de las opcciones de compra
-            if(character.gold <= actAffordableStone.value){
+            if(character.gold < actAffordableStone.value){
                 affordableStones.splice(i, 1);
+                i--;
             }
-
         }
-
     }
 }
 
@@ -271,8 +266,6 @@ function simulateAttack(){
     const charAtt = characters[0];
     const charDef = characters[1];
     
-    
-    console.log(charAtt);
     console.log("ATTACKER:");
     console.log(charAtt.name + " " + charAtt.life + " " + charAtt.weapon.name + " " + charAtt.weapon.numDieDamage + " " + charAtt.weapon.quality);
     
@@ -286,11 +279,7 @@ function simulateAttack(){
     console.log("\n\nAFTER THE ATTACK");
     console.log(charAtt.name + " " + charAtt.life + " " + charAtt.weapon.name + " " + charAtt.weapon.numDieDamage + " " + charAtt.weapon.quality);
     console.log(charDef.name + " " + charDef.life + " " + charDef.weapon.name + " " + charDef.weapon.numDieDamage + " " + charDef.weapon.quality);
-    
-    // console.log(characters)
 }
-
-
 
 
 
