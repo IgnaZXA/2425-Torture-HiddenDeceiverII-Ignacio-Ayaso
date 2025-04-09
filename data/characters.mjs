@@ -1,4 +1,4 @@
-const characters = [
+const charactersData = [
     {
       "name": "Kaelen Fireheart",
       "occupation": "priest",
@@ -41,4 +41,4 @@ const characters = [
     }
   ]
 
-export {characters}
+export {charactersData}
