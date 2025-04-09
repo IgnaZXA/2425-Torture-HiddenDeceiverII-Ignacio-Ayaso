@@ -1,4 +1,4 @@
-const weapons = [
+const weaponsData = [
     {
        "name":"Shadowfang Bow",
        "description":"A bow crafted from the bones of ancient dragons, its arrows never miss their mark.",
@@ -71,4 +71,4 @@ const weapons = [
     }
  ];
 
-export{weapons}
+export{weaponsData}
