@@ -15,13 +15,15 @@ export default class Character{
         let weaponDamage = 0;
         
         for(let i = 0; i < this.weapon.numDieDamage; i++){
-            let d6 = Math.floor(Math.random() * 6) + 1; [0, 5] + 1 --> [1, 6]
+            let d6 = Math.floor(Math.random() * 6) + 1; // [0, 5] + 1 --> [1, 6]
             weaponDamage += d6;
         }
 
-
         enemy.life -= weaponDamage;
         this.weapon.quality -= 3;
+
+        console.log(this.name + " attacks " + enemy.name + " and inflicts " + weaponDamage + " points of damage.")
+
 
         return weaponDamage;
     }
