@@ -1,4 +1,4 @@
-export default class preciousStone{
+export default class PreciousStone{
     constructor(name, description, value){
         this.name = name;                   // Nombre de la piedra.
         this.description = description;     // Descripcción de la piedra.
